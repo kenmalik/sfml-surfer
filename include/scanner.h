@@ -4,6 +4,7 @@
 #include "token-type.h"
 #include "token.h"
 #include <map>
+#include <stack>
 #include <vector>
 class Scanner {
   public:
@@ -30,11 +31,18 @@ class Scanner {
     char peek();
 
     void string();
+    void tag();
+    void textContent();
     void identifier();
 
     bool isAlpha(char c);
     bool isDigit(char c);
     bool isAlphaNumeric(char c);
+
+    void openTag(std::string tagName);
+    void closeTag(std::string tagName);
+
+    std::stack<std::string> openTags;
 
     static const std::map<std::string, TokenType> keywords;
 };

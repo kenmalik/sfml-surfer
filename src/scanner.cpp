@@ -15,6 +15,10 @@ std::vector<Token> Scanner::scanTokens() {
         scanToken();
     }
 
+    if (!openTags.empty()) {
+        Surfer::error(line, "Unclosed tags");
+    }
+
     tokens.push_back({END, "", "", 0});
     return tokens;
 }
@@ -34,18 +38,15 @@ void Scanner::scanToken() {
     case '=':
         addToken(EQUAL);
         break;
-    case '>':
-        addToken(GREATER);
-        break;
     case '<':
-        addToken(match('/') ? LESS_SLASH : LESS);
+        tag();
         break;
     case '"':
         string();
         break;
     default:
         if (isAlpha(c)) {
-            identifier();
+            textContent();
         } else {
             Surfer::error(line, "Unexpected character");
         }
@@ -99,6 +100,49 @@ void Scanner::string() {
     addToken(STRING, value);
 }
 
+void Scanner::tag() {
+    bool closing = match('/') ? true : false;
+    while (peek() != '>' && !isAtEnd()) {
+        if (peek() == '\n') {
+            line++;
+        }
+        advance();
+    }
+
+    if (isAtEnd()) {
+        Surfer::error(line, "Unterminated tag");
+        return;
+    }
+
+    advance();
+
+    std::string value = source.substr(start + (closing ? 2 : 1),
+                                      current - start - (closing ? 3 : 2));
+    addToken(closing ? CLOSING_TAG : TAG, value);
+    if (closing) {
+        closeTag(value);
+    } else {
+        openTag(value);
+    }
+}
+
+void Scanner::textContent() {
+    while (peek() != '<' && !isAtEnd()) {
+        if (peek() == '\n') {
+            line++;
+        }
+        advance();
+    }
+
+    if (isAtEnd()) {
+        Surfer::error(line, "Unclosed tag");
+        return;
+    }
+
+    std::string content = source.substr(start, current - start);
+    addToken(TEXT_CONTENT, content);
+}
+
 bool Scanner::isAlpha(char c) {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
@@ -121,4 +165,14 @@ void Scanner::identifier() {
         type = iter->second;
     }
     addToken(type);
+}
+
+void Scanner::openTag(std::string tagName) { openTags.push(tagName); }
+
+void Scanner::closeTag(std::string tagName) {
+    if (!openTags.empty() && openTags.top() == tagName) {
+        openTags.pop();
+    } else {
+        Surfer::error(line, "Unexpected closing of tag " + tagName);
+    }
 }
