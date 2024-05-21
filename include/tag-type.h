@@ -12,6 +12,6 @@ enum TagType {
 };
 
 static const char *TagStrings[] = {"p tag",  "a tag",  "div tag", "h1 tag",
-                                   "h2 tag", "h3 tag", "h4 tag",  "end"};
+                                   "h2 tag", "h3 tag", "h4 tag"};
 
 #endif // !SFMLSURFER_TAGTYPE_H

@@ -1,7 +1,6 @@
 #include "scanner.h"
 #include "surfer.h"
 #include "token-type.h"
-#include <iostream>
 
 const std::map<std::string, TokenType> Scanner::keywords = {
     {"p", P},   {"a", A},   {"div", DIV}, {"h1", H1},
@@ -19,7 +18,7 @@ std::vector<Token> Scanner::scanTokens() {
         Surfer::error(line, "Unclosed tags");
     }
 
-    tokens.push_back({END, "", "", 0});
+    tokens.push_back({END, "EOF", "", 0});
     return tokens;
 }
 
