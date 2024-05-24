@@ -1,10 +1,7 @@
 #include "scanner.h"
 #include "surfer.h"
 #include "token-type.h"
-
-const std::map<std::string, TokenType> Scanner::keywords = {
-    {"p", P},   {"a", A},   {"div", DIV}, {"h1", H1},
-    {"h2", H2}, {"h3", H3}, {"h4", H4}};
+#include <algorithm>
 
 Scanner::Scanner(std::string source) : source(source) {}
 
@@ -139,6 +136,7 @@ void Scanner::textContent() {
     }
 
     std::string content = source.substr(start, current - start);
+    std::replace(content.begin(), content.end(), '\n', ' ');
     addToken(TEXT_CONTENT, content);
 }
 
@@ -149,22 +147,6 @@ bool Scanner::isAlpha(char c) {
 bool Scanner::isDigit(char c) { return c >= '0' && c <= '9'; }
 
 bool Scanner::isAlphaNumeric(char c) { return isAlpha(c) || isDigit(c); }
-
-void Scanner::identifier() {
-    while (isAlphaNumeric(peek())) {
-        advance();
-    }
-
-    TokenType type;
-    std::string text = source.substr(start, current - start);
-    auto iter = keywords.find(text);
-    if (iter == keywords.end()) {
-        type = IDENTIFIER;
-    } else {
-        type = iter->second;
-    }
-    addToken(type);
-}
 
 void Scanner::openTag(std::string tagName) { openTags.push(tagName); }
 
