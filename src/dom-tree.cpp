@@ -1,4 +1,5 @@
 #include "dom-tree.h"
+#include "composite-gui-component.h"
 #include "div.h"
 #include "p.h"
 #include "text-content.h"
@@ -6,7 +7,7 @@
 #include <iostream>
 
 DOMTree::DOMTree(const std::vector<Token> *tokens) : tokens(tokens) {
-    root = new Div();
+    root = new CompositeGUIComponent();
     openTags.push({root, "div"});
 }
 
@@ -17,23 +18,16 @@ void DOMTree::render() {
 }
 
 void DOMTree::addTag(const std::string &type) {
-    Div *child = new Div();
+    auto child = new CompositeGUIComponent();
     openTags.top().first->addChild(child);
     openTags.push({child, type});
-    // if (type == "div") {
-    //     Div *child = new Div();
-    //     openTags.top().first->addChild(child);
-    //     openTags.push({child, type});
-    // } else if (type == "p") {
-    //     auto child = new PTag();
-    //     openTags.top().first->addChild(child);
-    //     openTags.push({child, type});
-    // }
-    // std::cout << "Added " << type << std::endl;
 }
 
+void DOMTree::closeTag() { openTags.pop(); }
+
 void DOMTree::addText(const std::string &content) {
-    auto text = new TextContent(content);
+    auto text = new Word();
+    text->setText(content);
     text->setPosition(0, currentY);
     currentY += text->getGlobalBounds().height;
     openTags.top().first->addChild(text);
@@ -50,14 +44,14 @@ void DOMTree::processToken() {
 
     switch (token.type) {
     case TAG:
-        std::cout << "Tag" << std::endl;
+        std::cout << "Tag " << token.value << std::endl;
         addTag(token.value);
         break;
     case CLOSING_TAG:
         std::cout << "Closing tag" << std::endl;
         if (token.value == openTags.top().second) {
             std::cout << "Closed " << token.value << std::endl;
-            openTags.pop();
+            closeTag();
         } else {
             std::cerr << "Invalid closing tag" << std::endl;
             exit(1);

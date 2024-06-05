@@ -1,6 +1,7 @@
 #ifndef SFMLSURFER_DOMTREE_H
 #define SFMLSURFER_DOMTREE_H
 
+#include "composite-gui-component.h"
 #include "element.h"
 #include "token.h"
 #include <SFML/Graphics/Drawable.hpp>
@@ -16,7 +17,8 @@ class DOMTree : public sf::Drawable {
 
     void draw(sf::RenderTarget &window, sf::RenderStates states) const override;
 
-    void addTag(const std::string &type);
+    void addTag(const std::string &content);
+    void closeTag();
 
     void render();
     void processToken();
@@ -29,9 +31,9 @@ class DOMTree : public sf::Drawable {
 
   private:
     const std::vector<Token> *tokens;
-    std::stack<std::pair<Element *, std::string>> openTags;
+    std::stack<std::pair<CompositeGUIComponent *, std::string>> openTags;
     std::string prevText;
-    Element *root = nullptr;
+    CompositeGUIComponent *root = nullptr;
 
     int current = 0;
 
