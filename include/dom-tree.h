@@ -3,6 +3,7 @@
 
 #include "composite-gui-component.h"
 #include "element.h"
+#include "gui-component.h"
 #include "token.h"
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -22,6 +23,10 @@ class DOMTree : public sf::Drawable {
 
     void render();
     void processToken();
+    void applyStyles();
+    void postOrderTraversal(GuiComponent *&node,
+                            void (DOMTree::*func)(GuiComponent *&param));
+    void styleComponent(GuiComponent *&component);
 
     const Token &advance();
 
@@ -31,9 +36,9 @@ class DOMTree : public sf::Drawable {
 
   private:
     const std::vector<Token> *tokens;
-    std::stack<std::pair<CompositeGUIComponent *, std::string>> openTags;
+    std::stack<std::pair<GuiComponent *, std::string>> openTags;
     std::string prevText;
-    CompositeGUIComponent *root = nullptr;
+    GuiComponent *root = nullptr;
 
     int current = 0;
 
