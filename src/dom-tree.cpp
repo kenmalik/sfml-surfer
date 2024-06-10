@@ -1,15 +1,21 @@
 #include "dom-tree.h"
 #include "composite-gui-component.h"
+#include "dom-element.h"
+#include "font-enum.h"
 #include "gui-component.h"
 #include "padding.h"
+#include "tag-type.h"
 #include "token-type.h"
 #include "word.h"
 
 #include <SFML/Graphics/Color.hpp>
 #include <iostream>
+const std::map<std::string, TagType> DOMTree::tagTypeMap = {
+    {"div", DIV}, {"p", P},   {"h1", H1}, {"h2", H2},      {"h3", H3},
+    {"h4", H4},   {"h5", H5}, {"h6", H6}, {"input", INPUT}};
 
 DOMTree::DOMTree(const std::vector<Token> *tokens) : tokens(tokens) {
-    root = new CompositeGUIComponent();
+    root = new DomElement();
     openTags.push({root, "div"});
 }
 
@@ -34,17 +40,20 @@ void DOMTree::addTag(const std::string &type) {
         exit(1);
     }
 
-    auto child = new CompositeGUIComponent();
+    auto child = new DomElement();
     composite->addChild(child);
+    if (tagTypeMap.count(type)) {
+        child->type = tagTypeMap.at(type);
+    }
     openTags.push({child, type});
 }
 
 void DOMTree::closeTag() { openTags.pop(); }
 
 void DOMTree::addText(const std::string &content) {
-    std::cout << "Adding text: " << content << std::endl;
     auto text = new Word();
     text->setText(content);
+    text->setCharacterSize(defaultCharacterSize);
     auto composite =
         dynamic_cast<CompositeGUIComponent *>(openTags.top().first);
     if (!composite) {
@@ -97,11 +106,102 @@ void DOMTree::applyStyles() {
 }
 
 void DOMTree::styleComponent(GuiComponent *&component) {
-    component->setPosition(component->getPosition().x, currentY);
-    auto padded = new Padding(component, 20, 50, 0);
-    padded->setBackgroundColor(sf::Color(200, 100, 50, 50));
-    component = padded;
-    currentY += component->getGlobalBounds().height;
+    auto composite = dynamic_cast<DomElement *>(component);
+    // Don't know why this works at positioning items but it does
+    if (composite && composite->getChildCount() <= 1) {
+        component->setPosition(component->getPosition().x, currentY);
+    }
+    switch (composite->type) {
+    case H1: {
+        for (auto iter = composite->childrenBegin();
+             iter != composite->childrenEnd(); ++iter) {
+            auto word = dynamic_cast<Word *>(*iter);
+            if (word) {
+                word->setFont(UBUNTU_B);
+                word->setCharacterSize(defaultCharacterSize * 2);
+            }
+        }
+        auto padded = new Padding(component, defaultCharacterSize * .67f, 0);
+        component = padded;
+    } break;
+    case H2: {
+        for (auto iter = composite->childrenBegin();
+             iter != composite->childrenEnd(); ++iter) {
+            auto word = dynamic_cast<Word *>(*iter);
+            if (word) {
+                word->setFont(UBUNTU_B);
+                word->setCharacterSize(defaultCharacterSize * 1.5);
+            }
+        }
+        auto padded = new Padding(component, defaultCharacterSize * .83f, 0);
+        component = padded;
+    } break;
+    case H3: {
+        for (auto iter = composite->childrenBegin();
+             iter != composite->childrenEnd(); ++iter) {
+            auto word = dynamic_cast<Word *>(*iter);
+            if (word) {
+                word->setFont(UBUNTU_B);
+                word->setCharacterSize(defaultCharacterSize * 1.17);
+            }
+        }
+        auto padded = new Padding(component, defaultCharacterSize, 0);
+        component = padded;
+    } break;
+    case H4: {
+        for (auto iter = composite->childrenBegin();
+             iter != composite->childrenEnd(); ++iter) {
+            auto word = dynamic_cast<Word *>(*iter);
+            if (word) {
+                word->setFont(UBUNTU_B);
+            }
+        }
+        auto padded = new Padding(component, defaultCharacterSize * 1.33f, 0);
+        component = padded;
+    } break;
+    case H5: {
+        for (auto iter = composite->childrenBegin();
+             iter != composite->childrenEnd(); ++iter) {
+            auto word = dynamic_cast<Word *>(*iter);
+            if (word) {
+                word->setFont(UBUNTU_B);
+                word->setCharacterSize(defaultCharacterSize * .83f);
+            }
+        }
+        auto padded = new Padding(component, defaultCharacterSize * 1.67f, 0);
+        component = padded;
+    } break;
+    case H6: {
+        for (auto iter = composite->childrenBegin();
+             iter != composite->childrenEnd(); ++iter) {
+            auto word = dynamic_cast<Word *>(*iter);
+            if (word) {
+                word->setFont(UBUNTU_B);
+                word->setCharacterSize(defaultCharacterSize * .67f);
+            }
+        }
+        auto padded = new Padding(component, defaultCharacterSize * 2.33f, 0);
+        component = padded;
+    } break;
+    case DIV: {
+        std::cout << "[TODO] Div styles" << std::endl;
+    } break;
+    case P: {
+        for (auto iter = composite->childrenBegin();
+             iter != composite->childrenEnd(); ++iter) {
+            auto word = dynamic_cast<Word *>(*iter);
+            if (word) {
+                word->setFont(UBUNTU_R);
+            }
+        }
+        auto padded = new Padding(component, defaultCharacterSize, 0);
+        component = padded;
+    } break;
+    default:
+        std::cerr << "Unsupported tag " << composite->type << std::endl;
+    }
+    currentY =
+        component->getGlobalBounds().top + component->getGlobalBounds().height;
 }
 
 void DOMTree::postOrderTraversal(GuiComponent *&node,

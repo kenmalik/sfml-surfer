@@ -17,15 +17,6 @@ enum TokenType {
     NUMBER,
     IDENTIFIER,
 
-    // Keywords.
-    P,
-    A,
-    DIV,
-    H1,
-    H2,
-    H3,
-    H4,
-
     END
 };
 

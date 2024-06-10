@@ -4,10 +4,13 @@
 #include "composite-gui-component.h"
 #include "element.h"
 #include "gui-component.h"
+#include "p.h"
+#include "tag-type.h"
 #include "token.h"
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <map>
 #include <stack>
 #include <string>
 #include <vector>
@@ -35,6 +38,8 @@ class DOMTree : public sf::Drawable {
     void addText(const std::string &content);
 
   private:
+    static constexpr unsigned int defaultCharacterSize = 18;
+    static const std::map<std::string, TagType> tagTypeMap;
     const std::vector<Token> *tokens;
     std::stack<std::pair<GuiComponent *, std::string>> openTags;
     std::string prevText;
