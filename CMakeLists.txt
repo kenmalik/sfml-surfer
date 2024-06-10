@@ -9,14 +9,14 @@ file(CREATE_LINK "${PROJECT_BINARY_DIR}/compile_commands.json"
      "${PROJECT_SOURCE_DIR}/compile_commands.json" SYMBOLIC)
 
 set(SOURCES
-    src/main.cpp
-    src/surfer.cpp
-    src/scanner.cpp
-    src/token.cpp
-    src/p.cpp
-    src/dom-tree.cpp
-    src/text-content.cpp
-    src/div.cpp)
+    "./src/main.cpp"
+    "./src/surfer.cpp"
+    "./src/scanner.cpp"
+    "./src/token.cpp"
+    "./src/p.cpp"
+    "./src/dom-tree.cpp"
+    "./src/text-content.cpp"
+    "./src/div.cpp")
 add_executable(Main ${SOURCES})
 
 target_include_directories(Main PRIVATE include)
