@@ -6,6 +6,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -66,12 +67,20 @@ void Surfer::display(const std::vector<Token> *tokens) {
                 window.close();
             } else if (event.type == sf::Event::Resized) {
                 view.setSize(window.getSize().x, window.getSize().y);
-                view.setCenter(window.getSize().x / 2.f, view.getCenter().y);
+                view.setCenter(
+                    window.getSize().x / 2.f,
+                    std::max(view.getCenter().y, window.getSize().y / 2.f));
                 window.setView(view);
                 dom.setWidth(window.getSize().x);
                 dom.render();
             } else if (event.type == sf::Event::MouseWheelMoved) {
-                view.move(0, -event.mouseWheel.delta * 50);
+                float offsetY = -event.mouseWheel.delta * 50;
+                if (view.getCenter().y + offsetY >= window.getSize().y / 2.f) {
+                    view.move(0, offsetY);
+                } else {
+                    view.setCenter(window.getSize().x / 2.f,
+                                   window.getSize().y / 2.f);
+                }
                 window.setView(view);
             }
         }
