@@ -72,14 +72,16 @@ void Styler::style(GuiComponent *&component) {
         }
     }
 
-    // Inline overwrite defaults
     for (auto &style : composite->css) {
         overwriteStyles(style);
     }
 
     if (stretch) {
-        padding.right = width - component->getGlobalBounds().width -
-                        margin.right - padding.left;
+        padding.right =
+            (width - component->getGlobalBounds().width -
+             margin.left * DEFAULT_SIZE - margin.right * DEFAULT_SIZE -
+             padding.left * DEFAULT_SIZE) /
+            DEFAULT_SIZE;
         if (padding.right < 0) {
             padding.right = 0;
         }

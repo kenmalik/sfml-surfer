@@ -5,6 +5,7 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -65,11 +66,13 @@ void Surfer::display(const std::vector<Token> *tokens) {
                 window.close();
             } else if (event.type == sf::Event::Resized) {
                 view.setSize(window.getSize().x, window.getSize().y);
-                view.setCenter(window.getSize().x / 2.f,
-                               window.getSize().y / 2.f);
+                view.setCenter(window.getSize().x / 2.f, view.getCenter().y);
                 window.setView(view);
                 dom.setWidth(window.getSize().x);
                 dom.render();
+            } else if (event.type == sf::Event::MouseWheelMoved) {
+                view.move(0, -event.mouseWheel.delta * 50);
+                window.setView(view);
             }
         }
         window.clear(sf::Color::White);

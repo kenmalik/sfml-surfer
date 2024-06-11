@@ -35,6 +35,9 @@ class DOMTree : public sf::Drawable {
     void setWidth(float width);
     void setStretch(bool on);
 
+    void clear();
+    void deleteNode(GuiComponent *&node);
+
   private:
     bool stretch = false;
     float width = 0;

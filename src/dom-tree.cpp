@@ -11,12 +11,14 @@
 #include <SFML/Graphics/Color.hpp>
 #include <iostream>
 
-DOMTree::DOMTree(const std::vector<Token> *tokens) : tokens(tokens) {
-    root = new DomElement();
-    openTags.push({root, "div"});
-}
+DOMTree::DOMTree(const std::vector<Token> *tokens) : tokens(tokens) {}
 
 void DOMTree::render() {
+    currentToken = 0;
+    currentY = 0;
+    clear();
+    root = new DomElement();
+    openTags.push({root, "div"});
     std::cout << "Processing html..." << std::endl;
     while (!isAtEnd()) {
         processToken();
@@ -143,3 +145,7 @@ void DOMTree::postOrderTraversal(GuiComponent *&node,
 void DOMTree::setWidth(float width) { this->width = width; }
 
 void DOMTree::setStretch(bool on) { stretch = on; }
+
+void DOMTree::clear() { postOrderTraversal(root, &DOMTree::deleteNode); }
+
+void DOMTree::deleteNode(GuiComponent *&node) { delete node; }
