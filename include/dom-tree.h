@@ -35,12 +35,11 @@ class DOMTree : public sf::Drawable {
     void addText(const std::string &content);
 
   private:
-    static constexpr unsigned int defaultCharacterSize = 18;
     const std::vector<Token> *tokens;
     std::stack<std::pair<GuiComponent *, std::string>> openTags;
     GuiComponent *root = nullptr;
 
-    int current = 0;
+    int currentToken = 0;
 
     float currentY = 0;
 };

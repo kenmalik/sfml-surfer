@@ -1,15 +1,10 @@
 #include "dom-tree.h"
-#include "color-manager.h"
 #include "composite-gui-component.h"
-#include "css-property-type.h"
 #include "css-scanner.h"
 #include "dom-element.h"
-#include "font-enum.h"
 #include "gui-component.h"
-#include "padding.h"
 #include "styler.h"
 #include "tag-scanner.h"
-#include "tag-type.h"
 #include "token-type.h"
 #include "word.h"
 
@@ -22,11 +17,11 @@ DOMTree::DOMTree(const std::vector<Token> *tokens) : tokens(tokens) {
 }
 
 void DOMTree::render() {
-    std::cout << "\nRendering Tokens:\n" << std::endl;
+    std::cout << "Processing html..." << std::endl;
     while (!isAtEnd()) {
         processToken();
     }
-    std::cout << "\nApplying Styles:\n" << std::endl;
+    std::cout << "Applying css..." << std::endl;
     applyStyles();
 }
 
@@ -49,7 +44,6 @@ void DOMTree::addTag(const std::string &tagContent) {
     composite->addChild(child);
     child->type = tag.type;
     if (tag.style != "") {
-        std::cout << "Styled " << scanner.tagString << std::endl;
         CssScanner cssScanner(tag.style);
         child->css = cssScanner.scanTokens();
     }
@@ -62,7 +56,6 @@ void DOMTree::closeTag() { openTags.pop(); }
 void DOMTree::addText(const std::string &content) {
     auto text = new Word();
     text->setText(content);
-    text->setCharacterSize(defaultCharacterSize);
     auto composite =
         dynamic_cast<CompositeGUIComponent *>(openTags.top().first);
     if (!composite) {
@@ -104,9 +97,9 @@ void DOMTree::processToken() {
     }
 }
 
-const Token &DOMTree::advance() { return tokens->at(current++); }
+const Token &DOMTree::advance() { return tokens->at(currentToken++); }
 
-bool DOMTree::isAtEnd() { return current >= tokens->size(); }
+bool DOMTree::isAtEnd() { return currentToken >= tokens->size(); }
 
 void DOMTree::applyStyles() {
     currentY = 0;

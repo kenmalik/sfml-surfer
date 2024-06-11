@@ -1,6 +1,7 @@
 #ifndef SFMLSURFER_STYLER_H
 #define SFMLSURFER_STYLER_H
 
+#include "css-token.h"
 #include "font-enum.h"
 #include "gui-component.h"
 #include "tag-type.h"
@@ -17,9 +18,10 @@ class Styler {
   public:
     Styler(TagType type);
     void style(GuiComponent *&component);
+    void overwriteStyles(const CssProperty &style);
 
   private:
-    static constexpr unsigned int DEFAULT_SIZE = 18;
+    static constexpr float DEFAULT_SIZE = 18;
 
     FontEnum font = UBUNTU_R;
     float sizeRatio = 1;
