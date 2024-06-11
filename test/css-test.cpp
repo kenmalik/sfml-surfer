@@ -48,13 +48,14 @@ void runPrompt() {
 
 void run(std::string source) {
     CssScanner scanner(source);
-    std::vector<CssProperty> tokens = scanner.scanTokens();
+    std::vector<Ruleset> rulesets = scanner.scanFile();
 
-    for (const auto &token : tokens) {
-        std::cout << "Token: " << CSS_PROPERTY_STRINGS.at(token.type)
-                  << " | Properties: ";
-        for (const auto &value : token.values) {
-            std::cout << value << " ";
+    for (const auto &ruleset : rulesets) {
+        std::cout << "Ruleset " << ruleset.selector << " " << ruleset.type
+                  << std::endl;
+        for (const auto &value : ruleset.properties) {
+            std::cout << "  " << CSS_PROPERTY_STRINGS.at(value.type)
+                      << std::endl;
         }
         std::cout << std::endl;
     }

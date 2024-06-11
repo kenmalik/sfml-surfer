@@ -5,10 +5,19 @@
 #include "css-token.h"
 #include <vector>
 
+enum SelectorType { TAG_NAME, ID_NAME, CLASS_NAME };
+
+struct Ruleset {
+    SelectorType type;
+    std::string selector;
+    std::vector<CssProperty> properties;
+};
+
 class CssScanner {
   public:
     CssScanner(std::string source);
-    std::vector<CssProperty> scanTokens();
+    std::vector<CssProperty> scanInline();
+    std::vector<Ruleset> scanFile();
 
   private:
     int start = 0;
@@ -16,11 +25,13 @@ class CssScanner {
     int line = 1;
 
     const std::string source;
-    std::vector<CssProperty> tokens;
+    std::vector<CssProperty> properties;
+    std::vector<Ruleset> rulesets;
 
     bool isAtEnd();
 
-    void scanToken();
+    void scanInlineToken();
+    void scanFileToken();
     char advance();
 
     void addToken(CssPropertyType type);
@@ -34,9 +45,11 @@ class CssScanner {
     bool isAlphaNumeric(char c);
 
     void readProperty();
+    void className();
 
     std::vector<std::string> *currentPropertyList;
     bool pushingProperty = false;
+    bool pushingRuleset = false;
 
     static const std::map<std::string, CssPropertyType> types;
 };

@@ -5,7 +5,6 @@
 #include "margin.h"
 #include "padding.h"
 #include "word.h"
-#include <iostream>
 
 Styler::Styler(TagType type) {
     switch (type) {

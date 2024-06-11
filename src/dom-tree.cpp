@@ -28,11 +28,14 @@ void DOMTree::render() {
 }
 
 void DOMTree::addTag(const std::string &tagContent) {
-    TagScanner scanner(tagContent);
-    Tag tag = scanner.scanTokens();
-
     if (openTags.empty()) {
         return;
+    }
+
+    TagScanner scanner(tagContent);
+    Tag tag = scanner.scanTokens();
+    if (tag.className != "") {
+        std::cout << tag.className << std::endl;
     }
 
     auto composite =
@@ -47,7 +50,7 @@ void DOMTree::addTag(const std::string &tagContent) {
     child->type = tag.type;
     if (tag.style != "") {
         CssScanner cssScanner(tag.style);
-        child->css = cssScanner.scanTokens();
+        child->css = cssScanner.scanInline();
     }
 
     openTags.push({child, scanner.tagString});

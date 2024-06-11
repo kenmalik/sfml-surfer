@@ -15,18 +15,27 @@ const std::map<std::string, CssPropertyType> CssScanner::types = {
 
 CssScanner::CssScanner(std::string source) : source(source) {}
 
-std::vector<CssProperty> CssScanner::scanTokens() {
+std::vector<CssProperty> CssScanner::scanInline() {
     while (!isAtEnd()) {
         start = current;
-        scanToken();
+        scanInlineToken();
     }
 
-    return tokens;
+    return properties;
+}
+
+std::vector<Ruleset> CssScanner::scanFile() {
+    while (!isAtEnd()) {
+        start = current;
+        scanFileToken();
+    }
+
+    return rulesets;
 }
 
 bool CssScanner::isAtEnd() { return current >= source.length(); }
 
-void CssScanner::scanToken() {
+void CssScanner::scanInlineToken() {
     char c = advance();
     switch (c) {
     case ' ':
@@ -53,6 +62,44 @@ void CssScanner::scanToken() {
     }
 }
 
+void CssScanner::scanFileToken() {
+    char c = advance();
+    switch (c) {
+    case ' ':
+    case '\r':
+    case '\t':
+        break;
+    case '\n':
+        line++;
+        break;
+    case ':':
+        pushingProperty = true;
+        break;
+    case ';':
+        pushingProperty = false;
+        break;
+    case '.':
+        if (isAlpha(peek())) {
+            className();
+        }
+        break;
+    case '{':
+        pushingRuleset = true;
+        break;
+    case '}':
+        pushingRuleset = false;
+        break;
+    default:
+        if (isAlphaNumeric(c)) {
+            readProperty();
+        } else {
+            std::string errorMsg = "Unexpected character " + std::string(1, c);
+            Surfer::error(line, errorMsg);
+        }
+        break;
+    }
+}
+
 char CssScanner::advance() { return source.at(current++); }
 
 void CssScanner::addToken(CssPropertyType type) { addToken(type, ""); }
@@ -62,7 +109,7 @@ void CssScanner::addToken(CssPropertyType type, std::string value) {
     CssProperty property;
     property.type = type;
     property.values.push_back(value);
-    tokens.push_back({type, {value}});
+    properties.push_back({type, {value}});
 }
 
 bool CssScanner::match(char expected) {
@@ -109,8 +156,8 @@ void CssScanner::readProperty() {
 
     if (!pushingProperty) {
         try {
-            tokens.push_back({types.at(value), {}});
-            currentPropertyList = &tokens.back().values;
+            properties.push_back({types.at(value), {}});
+            currentPropertyList = &properties.back().values;
         } catch (std::out_of_range e) {
             std::cerr << "Unsupported CSS property " << value << std::endl;
             exit(1);
@@ -118,4 +165,21 @@ void CssScanner::readProperty() {
     } else {
         currentPropertyList->push_back(value);
     }
+}
+
+void CssScanner::className() {
+    while (isAlphaNumeric(peek()) && !isAtEnd()) {
+        if (peek() == '\n') {
+            line++;
+        }
+        advance();
+    }
+
+    if (isAtEnd()) {
+        Surfer::error(line, "Hanging classname");
+        return;
+    }
+
+    std::string value = source.substr(start + 1, current - start - 1);
+    rulesets.push_back({CLASS_NAME, value, {}});
 }

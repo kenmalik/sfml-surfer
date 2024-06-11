@@ -5,8 +5,9 @@
 #include <string>
 
 struct Tag {
-    TagType type;
-    std::string style;
+    TagType type = OTHER;
+    std::string style = "";
+    std::string className = "";
 };
 
 #endif // !SFMLSURFER_TAG_H

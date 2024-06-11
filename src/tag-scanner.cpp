@@ -82,6 +82,8 @@ void TagScanner::string() {
     if (currentProperty != "") {
         if (currentProperty == "style") {
             tag.style = value;
+        } else if (currentProperty == "class") {
+            tag.className = value;
         }
     }
 }
