@@ -1,10 +1,7 @@
 #ifndef SFMLSURFER_DOMTREE_H
 #define SFMLSURFER_DOMTREE_H
 
-#include "composite-gui-component.h"
-#include "element.h"
 #include "gui-component.h"
-#include "p.h"
 #include "tag-type.h"
 #include "token.h"
 #include <SFML/Graphics/Drawable.hpp>
@@ -39,10 +36,8 @@ class DOMTree : public sf::Drawable {
 
   private:
     static constexpr unsigned int defaultCharacterSize = 18;
-    static const std::map<std::string, TagType> tagTypeMap;
     const std::vector<Token> *tokens;
     std::stack<std::pair<GuiComponent *, std::string>> openTags;
-    std::string prevText;
     GuiComponent *root = nullptr;
 
     int current = 0;

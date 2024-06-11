@@ -1,5 +1,6 @@
 #include "scanner.h"
 #include "surfer.h"
+#include "tag-scanner.h"
 #include "token-type.h"
 #include <algorithm>
 
@@ -118,7 +119,9 @@ void Scanner::tag() {
     if (closing) {
         closeTag(value);
     } else {
-        openTag(value);
+        TagScanner scanner(value);
+        Tag tag = scanner.scanTokens();
+        openTag(scanner.tagString);
     }
 }
 

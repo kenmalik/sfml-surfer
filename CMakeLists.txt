@@ -16,7 +16,9 @@ set(SOURCES
     "./src/p.cpp"
     "./src/dom-tree.cpp"
     "./src/text-content.cpp"
-    "./src/div.cpp")
+    "./src/div.cpp"
+    "./src/css-scanner.cpp"
+    "./src/tag-scanner.cpp")
 add_executable(Main ${SOURCES})
 
 target_include_directories(Main PRIVATE include)
@@ -38,3 +40,5 @@ find_package(
   SFML 2.5
   COMPONENTS graphics audio
   REQUIRED)
+
+add_subdirectory("./test")

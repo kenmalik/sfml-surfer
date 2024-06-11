@@ -4,6 +4,7 @@
 #include "token-type.h"
 #include <ostream>
 #include <string>
+
 class Token {
   public:
     const TokenType type;

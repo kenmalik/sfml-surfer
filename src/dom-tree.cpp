@@ -1,18 +1,19 @@
 #include "dom-tree.h"
+#include "color-manager.h"
 #include "composite-gui-component.h"
+#include "css-property-type.h"
+#include "css-scanner.h"
 #include "dom-element.h"
 #include "font-enum.h"
 #include "gui-component.h"
 #include "padding.h"
+#include "tag-scanner.h"
 #include "tag-type.h"
 #include "token-type.h"
 #include "word.h"
 
 #include <SFML/Graphics/Color.hpp>
 #include <iostream>
-const std::map<std::string, TagType> DOMTree::tagTypeMap = {
-    {"div", DIV}, {"p", P},   {"h1", H1}, {"h2", H2},       {"h3", H3},
-    {"h4", H4},   {"h5", H5}, {"h6", H6}, {"input", INPUT}, {"label", LABEL}};
 
 DOMTree::DOMTree(const std::vector<Token> *tokens) : tokens(tokens) {
     root = new DomElement();
@@ -28,7 +29,10 @@ void DOMTree::render() {
     applyStyles();
 }
 
-void DOMTree::addTag(const std::string &type) {
+void DOMTree::addTag(const std::string &tagContent) {
+    TagScanner scanner(tagContent);
+    Tag tag = scanner.scanTokens();
+
     if (openTags.empty()) {
         return;
     }
@@ -36,16 +40,20 @@ void DOMTree::addTag(const std::string &type) {
     auto composite =
         dynamic_cast<CompositeGUIComponent *>(openTags.top().first);
     if (!composite) {
-        std::cerr << "Cannot add child to " << type << std::endl;
+        std::cerr << "Cannot add child to " << tagContent << std::endl;
         exit(1);
     }
 
     auto child = new DomElement();
     composite->addChild(child);
-    if (tagTypeMap.count(type)) {
-        child->type = tagTypeMap.at(type);
+    child->type = tag.type;
+    if (tag.style != "") {
+        std::cout << "Styled " << scanner.tagString << std::endl;
+        CssScanner cssScanner(tag.style);
+        child->css = cssScanner.scanTokens();
     }
-    openTags.push({child, type});
+
+    openTags.push({child, scanner.tagString});
 }
 
 void DOMTree::closeTag() { openTags.pop(); }
@@ -78,7 +86,6 @@ void DOMTree::processToken() {
         break;
     case CLOSING_TAG:
         if (token.value == openTags.top().second) {
-            std::cout << "Closed " << token.value << std::endl;
             closeTag();
         } else {
             std::cerr << "Invalid closing tag" << std::endl;
@@ -111,6 +118,13 @@ void DOMTree::styleComponent(GuiComponent *&component) {
     if (composite && composite->getChildCount() <= 1) {
         component->setPosition(component->getPosition().x, currentY);
     }
+
+    bool styled = !composite->css.empty();
+
+    if (!composite->css.empty()) {
+        std::cout << composite->css.at(0).values.at(0) << std::endl;
+    }
+
     switch (composite->type) {
     case H1: {
         for (auto iter = composite->childrenBegin();
@@ -119,9 +133,28 @@ void DOMTree::styleComponent(GuiComponent *&component) {
             if (word) {
                 word->setFont(UBUNTU_B);
                 word->setCharacterSize(defaultCharacterSize * 2);
+                if (styled) {
+                    for (auto &style : composite->css) {
+                        if (style.type == COLOR) {
+                            word->setTextColor(
+                                ColorManager::getColor(style.values.at(0)));
+                        } else if (style.type == TEXT_DECORATION &&
+                                   style.values.at(0) == "underline") {
+                            word->setIsUnderlined(true);
+                        }
+                    }
+                }
             }
         }
         auto padded = new Padding(component, defaultCharacterSize * .67f, 0);
+        if (styled) {
+            for (auto &style : composite->css) {
+                if (style.type == BACKGROUND_COLOR) {
+                    padded->setBackgroundColor(
+                        ColorManager::getColor(style.values.at(0)));
+                }
+            }
+        }
         component = padded;
     } break;
     case H2: {
@@ -185,6 +218,16 @@ void DOMTree::styleComponent(GuiComponent *&component) {
     } break;
     case DIV: {
         std::cout << "[TODO] Div styles" << std::endl;
+        auto padded = new Padding(component, 0);
+        if (styled) {
+            for (auto &style : composite->css) {
+                if (style.type == BACKGROUND_COLOR) {
+                    padded->setBackgroundColor(
+                        ColorManager::getColor(style.values.at(0)));
+                }
+            }
+        }
+        component = padded;
     } break;
     case LABEL: {
         auto padded = new Padding(component, 0);
