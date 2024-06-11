@@ -20,8 +20,14 @@ class Styler {
     void style(GuiComponent *&component);
     void overwriteStyles(const CssProperty &style);
 
+    void setWidth(float width);
+    void setStretch(bool on);
+
   private:
     static constexpr float DEFAULT_SIZE = 18;
+
+    float width = 0;
+    bool stretch = false;
 
     FontEnum font = UBUNTU_R;
     float sizeRatio = 1;

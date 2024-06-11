@@ -77,6 +77,14 @@ void Styler::style(GuiComponent *&component) {
         overwriteStyles(style);
     }
 
+    if (stretch) {
+        padding.right = width - component->getGlobalBounds().width -
+                        margin.right - padding.left;
+        if (padding.right < 0) {
+            padding.right = 0;
+        }
+    }
+
     auto padded = new Padding(
         component, DEFAULT_SIZE * padding.top, DEFAULT_SIZE * padding.right,
         DEFAULT_SIZE * padding.bottom, DEFAULT_SIZE * padding.left);
@@ -172,3 +180,7 @@ void Styler::overwriteStyles(const CssProperty &style) {
         }
     }
 }
+
+void Styler::setWidth(float width) { this->width = width; }
+
+void Styler::setStretch(bool on) { stretch = on; }

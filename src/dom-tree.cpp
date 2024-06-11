@@ -114,6 +114,10 @@ void DOMTree::styleComponent(GuiComponent *&component) {
     }
 
     auto styler = Styler(composite->type);
+    if (stretch) {
+        styler.setWidth(width);
+        styler.setStretch(true);
+    }
     styler.style(component);
     currentY =
         component->getGlobalBounds().top + component->getGlobalBounds().height;
@@ -135,3 +139,7 @@ void DOMTree::postOrderTraversal(GuiComponent *&node,
         ((*this).*func)(node);
     }
 }
+
+void DOMTree::setWidth(float width) { this->width = width; }
+
+void DOMTree::setStretch(bool on) { stretch = on; }

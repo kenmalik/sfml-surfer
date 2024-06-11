@@ -4,6 +4,7 @@
 #include "word.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/View.hpp>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -36,11 +37,6 @@ void Surfer::run(std::string source) {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scanTokens();
 
-    // for (auto &token : tokens) {
-    //     std::cout << token << std::endl;
-    //     std::cout << " -" << token.type << std::endl;
-    // }
-
     Surfer::display(&tokens);
 }
 
@@ -53,29 +49,30 @@ void Surfer::report(int line, std::string where, std::string message) {
 }
 
 void Surfer::display(const std::vector<Token> *tokens) {
-    DOMTree dom(tokens);
-    dom.render();
-
-    sf::CircleShape circle(100);
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT),
                             "SFML Surfer");
+    DOMTree dom(tokens);
+    dom.setWidth(window.getSize().x);
+    dom.setStretch(true);
+    dom.render();
 
-    // Word word;
-    // word.setText("SFML Surfer");
-    // word.setFont(UBUNTU_R);
-    // word.setTextColor(sf::Color::White);
-    // word.setPadding(20, 80);
-    // word.setBackgroundColor(sf::Color::Green);
+    sf::View view = window.getView();
 
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
+            } else if (event.type == sf::Event::Resized) {
+                view.setSize(window.getSize().x, window.getSize().y);
+                view.setCenter(window.getSize().x / 2.f,
+                               window.getSize().y / 2.f);
+                window.setView(view);
+                dom.setWidth(window.getSize().x);
+                dom.render();
             }
         }
         window.clear(sf::Color::White);
-        // window.draw(word);
         window.draw(dom);
         window.display();
     }
