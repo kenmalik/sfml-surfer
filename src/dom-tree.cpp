@@ -7,6 +7,7 @@
 #include "font-enum.h"
 #include "gui-component.h"
 #include "padding.h"
+#include "styler.h"
 #include "tag-scanner.h"
 #include "tag-type.h"
 #include "token-type.h"
@@ -119,134 +120,8 @@ void DOMTree::styleComponent(GuiComponent *&component) {
         component->setPosition(component->getPosition().x, currentY);
     }
 
-    bool styled = !composite->css.empty();
-
-    if (!composite->css.empty()) {
-        std::cout << composite->css.at(0).values.at(0) << std::endl;
-    }
-
-    switch (composite->type) {
-    case H1: {
-        for (auto iter = composite->childrenBegin();
-             iter != composite->childrenEnd(); ++iter) {
-            auto word = dynamic_cast<Word *>(*iter);
-            if (word) {
-                word->setFont(UBUNTU_B);
-                word->setCharacterSize(defaultCharacterSize * 2);
-                if (styled) {
-                    for (auto &style : composite->css) {
-                        if (style.type == COLOR) {
-                            word->setTextColor(
-                                ColorManager::getColor(style.values.at(0)));
-                        } else if (style.type == TEXT_DECORATION &&
-                                   style.values.at(0) == "underline") {
-                            word->setIsUnderlined(true);
-                        }
-                    }
-                }
-            }
-        }
-        auto padded = new Padding(component, defaultCharacterSize * .67f, 0);
-        if (styled) {
-            for (auto &style : composite->css) {
-                if (style.type == BACKGROUND_COLOR) {
-                    padded->setBackgroundColor(
-                        ColorManager::getColor(style.values.at(0)));
-                }
-            }
-        }
-        component = padded;
-    } break;
-    case H2: {
-        for (auto iter = composite->childrenBegin();
-             iter != composite->childrenEnd(); ++iter) {
-            auto word = dynamic_cast<Word *>(*iter);
-            if (word) {
-                word->setFont(UBUNTU_B);
-                word->setCharacterSize(defaultCharacterSize * 1.5);
-            }
-        }
-        auto padded = new Padding(component, defaultCharacterSize * .83f, 0);
-        component = padded;
-    } break;
-    case H3: {
-        for (auto iter = composite->childrenBegin();
-             iter != composite->childrenEnd(); ++iter) {
-            auto word = dynamic_cast<Word *>(*iter);
-            if (word) {
-                word->setFont(UBUNTU_B);
-                word->setCharacterSize(defaultCharacterSize * 1.17);
-            }
-        }
-        auto padded = new Padding(component, defaultCharacterSize, 0);
-        component = padded;
-    } break;
-    case H4: {
-        for (auto iter = composite->childrenBegin();
-             iter != composite->childrenEnd(); ++iter) {
-            auto word = dynamic_cast<Word *>(*iter);
-            if (word) {
-                word->setFont(UBUNTU_B);
-            }
-        }
-        auto padded = new Padding(component, defaultCharacterSize * 1.33f, 0);
-        component = padded;
-    } break;
-    case H5: {
-        for (auto iter = composite->childrenBegin();
-             iter != composite->childrenEnd(); ++iter) {
-            auto word = dynamic_cast<Word *>(*iter);
-            if (word) {
-                word->setFont(UBUNTU_B);
-                word->setCharacterSize(defaultCharacterSize * .83f);
-            }
-        }
-        auto padded = new Padding(component, defaultCharacterSize * 1.67f, 0);
-        component = padded;
-    } break;
-    case H6: {
-        for (auto iter = composite->childrenBegin();
-             iter != composite->childrenEnd(); ++iter) {
-            auto word = dynamic_cast<Word *>(*iter);
-            if (word) {
-                word->setFont(UBUNTU_B);
-                word->setCharacterSize(defaultCharacterSize * .67f);
-            }
-        }
-        auto padded = new Padding(component, defaultCharacterSize * 2.33f, 0);
-        component = padded;
-    } break;
-    case DIV: {
-        std::cout << "[TODO] Div styles" << std::endl;
-        auto padded = new Padding(component, 0);
-        if (styled) {
-            for (auto &style : composite->css) {
-                if (style.type == BACKGROUND_COLOR) {
-                    padded->setBackgroundColor(
-                        ColorManager::getColor(style.values.at(0)));
-                }
-            }
-        }
-        component = padded;
-    } break;
-    case LABEL: {
-        auto padded = new Padding(component, 0);
-        component = padded;
-    } break;
-    case P: {
-        for (auto iter = composite->childrenBegin();
-             iter != composite->childrenEnd(); ++iter) {
-            auto word = dynamic_cast<Word *>(*iter);
-            if (word) {
-                word->setFont(UBUNTU_R);
-            }
-        }
-        auto padded = new Padding(component, defaultCharacterSize, 0);
-        component = padded;
-    } break;
-    default:
-        std::cerr << "Unsupported tag " << composite->type << std::endl;
-    }
+    auto styler = Styler(composite->type);
+    styler.style(component);
     currentY =
         component->getGlobalBounds().top + component->getGlobalBounds().height;
 }

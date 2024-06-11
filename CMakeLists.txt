@@ -13,12 +13,11 @@ set(SOURCES
     "./src/surfer.cpp"
     "./src/scanner.cpp"
     "./src/token.cpp"
-    "./src/p.cpp"
     "./src/dom-tree.cpp"
     "./src/text-content.cpp"
-    "./src/div.cpp"
     "./src/css-scanner.cpp"
-    "./src/tag-scanner.cpp")
+    "./src/tag-scanner.cpp"
+    "./src/styler.cpp")
 add_executable(Main ${SOURCES})
 
 target_include_directories(Main PRIVATE include)
