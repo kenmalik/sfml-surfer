@@ -1,10 +1,13 @@
 #include "styler.h"
 #include "color-manager.h"
+#include "css-scanner.h"
 #include "css-token.h"
 #include "dom-element.h"
 #include "margin.h"
 #include "padding.h"
 #include "word.h"
+#include <algorithm>
+#include <iostream>
 
 Styler::Styler(TagType type) {
     switch (type) {
@@ -66,6 +69,22 @@ void Styler::style(GuiComponent *&component) {
                 } else if (style.type == TEXT_DECORATION &&
                            style.values.at(0) == "underline") {
                     word->setIsUnderlined(true);
+                }
+            }
+        }
+    }
+
+    if (!cssRules.empty() && !composite->classes.empty()) {
+        for (const auto &value : composite->classes) {
+            auto rule = std::find_if(cssRules.begin(), cssRules.end(),
+                                     [&value](const Ruleset &ruleset) {
+                                         return ruleset.selector == value;
+                                     });
+            if (rule != cssRules.end()) {
+                std::cout << "Rule found for " << (*rule).selector << std::endl;
+                for (auto &style : rule->properties) {
+                    std::cout << style.values.at(0) << std::endl;
+                    overwriteStyles(style);
                 }
             }
         }
@@ -185,3 +204,7 @@ void Styler::overwriteStyles(const CssProperty &style) {
 void Styler::setWidth(float width) { this->width = width; }
 
 void Styler::setStretch(bool on) { stretch = on; }
+
+void Styler::addRuleset(const std::vector<Ruleset> &ruleset) {
+    cssRules = ruleset;
+}

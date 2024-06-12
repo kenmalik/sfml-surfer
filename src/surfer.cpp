@@ -1,4 +1,5 @@
 #include "surfer.h"
+#include "css-scanner.h"
 #include "dom-tree.h"
 #include "scanner.h"
 #include "word.h"
@@ -57,6 +58,12 @@ void Surfer::display(const std::vector<Token> *tokens) {
     dom.setWidth(window.getSize().x);
     dom.setStretch(true);
     dom.render();
+
+    std::ifstream infile("test.css");
+    std::stringstream buffer;
+    buffer << infile.rdbuf();
+    std::vector<Ruleset> rules = CssScanner(buffer.str()).scanFile();
+    dom.addRuleset(rules);
 
     sf::View view = window.getView();
 

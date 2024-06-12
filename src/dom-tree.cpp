@@ -34,9 +34,6 @@ void DOMTree::addTag(const std::string &tagContent) {
 
     TagScanner scanner(tagContent);
     Tag tag = scanner.scanTokens();
-    if (tag.className != "") {
-        std::cout << tag.className << std::endl;
-    }
 
     auto composite =
         dynamic_cast<CompositeGUIComponent *>(openTags.top().first);
@@ -48,6 +45,9 @@ void DOMTree::addTag(const std::string &tagContent) {
     auto child = new DomElement();
     composite->addChild(child);
     child->type = tag.type;
+    if (tag.className != "") {
+        child->classes.push_back(tag.className);
+    }
     if (tag.style != "") {
         CssScanner cssScanner(tag.style);
         child->css = cssScanner.scanInline();
@@ -119,6 +119,7 @@ void DOMTree::styleComponent(GuiComponent *&component) {
     }
 
     auto styler = Styler(composite->type);
+    styler.addRuleset(cssRules);
     if (stretch) {
         styler.setWidth(width);
         styler.setStretch(true);
@@ -152,3 +153,7 @@ void DOMTree::setStretch(bool on) { stretch = on; }
 void DOMTree::clear() { postOrderTraversal(root, &DOMTree::deleteNode); }
 
 void DOMTree::deleteNode(GuiComponent *&node) { delete node; }
+
+void DOMTree::addRuleset(const std::vector<Ruleset> &ruleset) {
+    cssRules = ruleset;
+}

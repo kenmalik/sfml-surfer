@@ -1,6 +1,7 @@
 #ifndef SFMLSURFER_STYLER_H
 #define SFMLSURFER_STYLER_H
 
+#include "css-scanner.h"
 #include "css-token.h"
 #include "font-enum.h"
 #include "gui-component.h"
@@ -23,8 +24,12 @@ class Styler {
     void setWidth(float width);
     void setStretch(bool on);
 
+    void addRuleset(const std::vector<Ruleset> &ruleset);
+
   private:
     static constexpr float DEFAULT_SIZE = 18;
+
+    std::vector<Ruleset> cssRules;
 
     float width = 0;
     bool stretch = false;

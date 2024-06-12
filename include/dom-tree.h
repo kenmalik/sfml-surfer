@@ -1,6 +1,7 @@
 #ifndef SFMLSURFER_DOMTREE_H
 #define SFMLSURFER_DOMTREE_H
 
+#include "css-scanner.h"
 #include "gui-component.h"
 #include "token.h"
 #include <SFML/Graphics/Drawable.hpp>
@@ -38,11 +39,14 @@ class DOMTree : public sf::Drawable {
     void clear();
     void deleteNode(GuiComponent *&node);
 
+    void addRuleset(const std::vector<Ruleset> &ruleset);
+
   private:
     bool stretch = false;
     float width = 0;
 
     const std::vector<Token> *tokens;
+    std::vector<Ruleset> cssRules;
     std::stack<std::pair<GuiComponent *, std::string>> openTags;
     GuiComponent *root = nullptr;
 

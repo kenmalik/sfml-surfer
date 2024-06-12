@@ -9,6 +9,7 @@ class DomElement : public CompositeGUIComponent {
   public:
     TagType type = OTHER;
     std::vector<CssProperty> css;
+    std::vector<std::string> classes;
 };
 
 #endif // !SFMLSURFER_DOMELEMENT_H

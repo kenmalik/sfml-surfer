@@ -53,10 +53,12 @@ void run(std::string source) {
     for (const auto &ruleset : rulesets) {
         std::cout << "Ruleset " << ruleset.selector << " " << ruleset.type
                   << std::endl;
-        for (const auto &value : ruleset.properties) {
-            std::cout << "  " << CSS_PROPERTY_STRINGS.at(value.type)
-                      << std::endl;
+        for (const auto &property : ruleset.properties) {
+            std::cout << "  " << CSS_PROPERTY_STRINGS.at(property.type);
+            for (const auto &value : property.values) {
+                std::cout << " " << value;
+            }
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
     }
 }

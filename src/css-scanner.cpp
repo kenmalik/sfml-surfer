@@ -154,6 +154,15 @@ void CssScanner::readProperty() {
 
     std::string value = source.substr(start, current - start);
 
+    if (pushingRuleset) {
+        if (pushingProperty) {
+            rulesets.back().properties.back().values.push_back(value);
+        } else {
+            rulesets.back().properties.push_back({types.at(value), {}});
+        }
+        return;
+    }
+
     if (!pushingProperty) {
         try {
             properties.push_back({types.at(value), {}});
