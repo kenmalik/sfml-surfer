@@ -1,10 +1,6 @@
 #include "tag-scanner.h"
 #include "surfer.h"
 
-const std::map<std::string, TagType> TagScanner::tagTypeMap = {
-    {"div", DIV}, {"p", P},   {"h1", H1}, {"h2", H2},       {"h3", H3},
-    {"h4", H4},   {"h5", H5}, {"h6", H6}, {"input", INPUT}, {"label", LABEL}};
-
 TagScanner::TagScanner(std::string source) : source(source) {}
 
 Tag TagScanner::scanTokens() {

@@ -1,10 +1,12 @@
 #include "styler.h"
 #include "color-manager.h"
+#include "css-property-type.h"
 #include "css-scanner.h"
 #include "css-token.h"
 #include "dom-element.h"
 #include "margin.h"
 #include "padding.h"
+#include "tag-type.h"
 #include "word.h"
 #include <algorithm>
 #include <iostream>
@@ -56,42 +58,60 @@ Styler::Styler(TagType type) {
 
 void Styler::style(GuiComponent *&component) {
     auto composite = dynamic_cast<DomElement *>(component);
-    for (auto iter = composite->childrenBegin();
-         iter != composite->childrenEnd(); ++iter) {
-        auto word = dynamic_cast<Word *>(*iter);
-        if (word) {
-            word->setFont(font);
-            word->setCharacterSize(DEFAULT_SIZE * sizeRatio);
-            for (auto &style : composite->css) {
-                if (style.type == COLOR) {
-                    word->setTextColor(
-                        ColorManager::getColor(style.values.at(0)));
-                } else if (style.type == TEXT_DECORATION &&
-                           style.values.at(0) == "underline") {
-                    word->setIsUnderlined(true);
+
+    if (!cssRules.empty()) {
+        if (!composite->classes.empty()) {
+            for (const auto &value : composite->classes) {
+                auto rule = std::find_if(cssRules.begin(), cssRules.end(),
+                                         [&value](const Ruleset &ruleset) {
+                                             return ruleset.selector == value &&
+                                                    ruleset.type == CLASS_NAME;
+                                         });
+                if (rule != cssRules.end()) {
+                    for (auto &style : rule->properties) {
+                        overwriteStyles(style);
+                    }
                 }
             }
         }
-    }
-
-    if (!cssRules.empty() && !composite->classes.empty()) {
-        for (const auto &value : composite->classes) {
-            auto rule = std::find_if(cssRules.begin(), cssRules.end(),
-                                     [&value](const Ruleset &ruleset) {
-                                         return ruleset.selector == value;
-                                     });
-            if (rule != cssRules.end()) {
-                std::cout << "Rule found for " << (*rule).selector << std::endl;
-                for (auto &style : rule->properties) {
-                    std::cout << style.values.at(0) << std::endl;
-                    overwriteStyles(style);
-                }
+        auto tagRule = std::find_if(
+            cssRules.begin(), cssRules.end(),
+            [&composite](const Ruleset &ruleset) {
+                return ruleset.type == TAG_NAME &&
+                       tagTypeMap.count(ruleset.selector) > 0 &&
+                       tagTypeMap.at(ruleset.selector) == composite->type;
+            });
+        if (tagRule != cssRules.end()) {
+            for (auto &style : tagRule->properties) {
+                overwriteStyles(style);
             }
         }
     }
 
     for (auto &style : composite->css) {
         overwriteStyles(style);
+    }
+
+    for (auto iter = composite->childrenBegin();
+         iter != composite->childrenEnd(); ++iter) {
+        auto word = dynamic_cast<Word *>(*iter);
+        if (word) {
+            word->setFont(font);
+            word->setCharacterSize(DEFAULT_SIZE * sizeRatio);
+            word->setTextColor(textColor);
+            if (textStyle == "underline") {
+                word->setIsUnderlined(true);
+            }
+            for (auto &style : composite->css) {
+                if (style.type == COLOR) {
+                    word->setTextColor(
+                        ColorManager::getColor(style.values.at(0)));
+                } else if (style.type == TEXT_DECORATION &&
+                           style.values.front() == "underline") {
+                    word->setIsUnderlined(true);
+                }
+            }
+        }
     }
 
     if (stretch) {
@@ -108,11 +128,11 @@ void Styler::style(GuiComponent *&component) {
     auto padded = new Padding(
         component, DEFAULT_SIZE * padding.top, DEFAULT_SIZE * padding.right,
         DEFAULT_SIZE * padding.bottom, DEFAULT_SIZE * padding.left);
+    padded->setBackgroundColor(paddingColor);
+
     auto margined = new Margin(
         padded, DEFAULT_SIZE * margin.top, DEFAULT_SIZE * margin.right,
         DEFAULT_SIZE * margin.bottom, DEFAULT_SIZE * margin.left);
-
-    padded->setBackgroundColor(paddingColor);
 
     component = margined;
 }
@@ -198,6 +218,10 @@ void Styler::overwriteStyles(const CssProperty &style) {
         default:
             break;
         }
+    } else if (style.type == COLOR) {
+        textColor = ColorManager::getColor(style.values.front());
+    } else if (style.type == TEXT_DECORATION) {
+        textStyle = "underline";
     }
 }
 

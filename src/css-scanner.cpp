@@ -91,7 +91,11 @@ void CssScanner::scanFileToken() {
         break;
     default:
         if (isAlphaNumeric(c)) {
-            readProperty();
+            if (!pushingRuleset) {
+                readTag();
+            } else {
+                readProperty();
+            }
         } else {
             std::string errorMsg = "Unexpected character " + std::string(1, c);
             Surfer::error(line, errorMsg);
@@ -191,4 +195,21 @@ void CssScanner::className() {
 
     std::string value = source.substr(start + 1, current - start - 1);
     rulesets.push_back({CLASS_NAME, value, {}});
+}
+
+void CssScanner::readTag() {
+    while (isAlphaNumeric(peek()) && !isAtEnd()) {
+        if (peek() == '\n') {
+            line++;
+        }
+        advance();
+    }
+
+    if (isAtEnd()) {
+        Surfer::error(line, "Tag not assigned ruleset");
+        return;
+    }
+
+    std::string value = source.substr(start, current - start);
+    rulesets.push_back({TAG_NAME, value, {}});
 }

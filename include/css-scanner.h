@@ -46,6 +46,7 @@ class CssScanner {
 
     void readProperty();
     void className();
+    void readTag();
 
     std::vector<std::string> *currentPropertyList;
     bool pushingProperty = false;

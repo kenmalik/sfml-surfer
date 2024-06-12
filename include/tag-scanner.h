@@ -3,7 +3,6 @@
 
 #include "tag-type.h"
 #include "tag.h"
-#include <map>
 
 class TagScanner {
   public:
@@ -18,7 +17,6 @@ class TagScanner {
     int current = 0;
     int line = 1;
 
-    static const std::map<std::string, TagType> tagTypeMap;
     const std::string source;
 
     bool isAtEnd();
