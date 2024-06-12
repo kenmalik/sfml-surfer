@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(Review_Project)
+project(SFML_SURFER)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,9 +16,9 @@ set(SOURCES
     "./src/css-scanner.cpp"
     "./src/tag-scanner.cpp"
     "./src/styler.cpp")
-add_executable(Main ${SOURCES})
+add_executable(sfml-surfer ${SOURCES})
 
-target_include_directories(Main PRIVATE include)
+target_include_directories(sfml-surfer PRIVATE include)
 
 include(FetchContent)
 
@@ -29,8 +29,8 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(GUI_Library)
 
-target_include_directories(Main PUBLIC ${GUI_Library_SOURCE_DIR}/include)
-target_link_libraries(Main PUBLIC sfml-graphics sfml-window sfml-system
+target_include_directories(sfml-surfer PUBLIC ${GUI_Library_SOURCE_DIR}/include)
+target_link_libraries(sfml-surfer PUBLIC sfml-graphics sfml-window sfml-system
                                   sfml-audio gui-library)
 
 find_package(

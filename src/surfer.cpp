@@ -12,10 +12,20 @@
 #include <sstream>
 #include <vector>
 
+std::string Surfer::cssPath;
 bool Surfer::hadError = false;
+
+void Surfer::runFile(std::string htmlPath, std::string cssPath) {
+    Surfer::cssPath = cssPath;
+    runFile(htmlPath);
+}
 
 void Surfer::runFile(std::string path) {
     std::ifstream infile(path);
+    if (infile.fail()) {
+        std::cerr << "Error opening html file " << path << std::endl;
+        exit(1);
+    }
     std::stringstream buffer;
     buffer << infile.rdbuf();
     run(buffer.str());
@@ -51,18 +61,16 @@ void Surfer::report(int line, std::string where, std::string message) {
 }
 
 void Surfer::display(const std::vector<Token> *tokens) {
+
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT),
                             "SFML Surfer");
     DOMTree dom(tokens);
     dom.setWidth(window.getSize().x);
     dom.setStretch(true);
+    if (!cssPath.empty()) {
+        dom.addRuleset(readCssFile());
+    }
     dom.render();
-
-    std::ifstream infile("test.css");
-    std::stringstream buffer;
-    buffer << infile.rdbuf();
-    std::vector<Ruleset> rules = CssScanner(buffer.str()).scanFile();
-    dom.addRuleset(rules);
 
     sf::View view = window.getView();
 
@@ -94,4 +102,15 @@ void Surfer::display(const std::vector<Token> *tokens) {
         window.draw(dom);
         window.display();
     }
+}
+
+std::vector<Ruleset> Surfer::readCssFile() {
+    std::ifstream infile(cssPath);
+    if (infile.fail()) {
+        std::cerr << "Error opening css file " << cssPath << std::endl;
+        exit(1);
+    }
+    std::stringstream buffer;
+    buffer << infile.rdbuf();
+    return CssScanner(buffer.str()).scanFile();
 }
