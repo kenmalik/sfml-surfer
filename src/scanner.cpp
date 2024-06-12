@@ -16,7 +16,6 @@ std::vector<Token> Scanner::scanTokens() {
         Surfer::error(line, "Unclosed tags");
     }
 
-    tokens.push_back({END, "EOF", "", 0});
     return tokens;
 }
 
@@ -32,14 +31,8 @@ void Scanner::scanToken() {
     case '\n':
         line++;
         break;
-    case '=':
-        addToken(EQUAL);
-        break;
     case '<':
         tag();
-        break;
-    case '"':
-        string();
         break;
     default:
         if (isAlpha(c)) {
@@ -76,25 +69,6 @@ char Scanner::peek() {
         return '\0';
     }
     return source.at(current);
-}
-
-void Scanner::string() {
-    while (peek() != '"' && !isAtEnd()) {
-        if (peek() == '\n') {
-            line++;
-        }
-        advance();
-    }
-
-    if (isAtEnd()) {
-        Surfer::error(line, "Unterminated string");
-        return;
-    }
-
-    advance();
-
-    std::string value = source.substr(start + 1, current - start - 2);
-    addToken(STRING, value);
 }
 
 void Scanner::tag() {

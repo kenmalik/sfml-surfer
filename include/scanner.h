@@ -5,6 +5,7 @@
 #include "token.h"
 #include <stack>
 #include <vector>
+
 class Scanner {
   public:
     Scanner(std::string source);
@@ -29,7 +30,6 @@ class Scanner {
     bool match(char expected);
     char peek();
 
-    void string();
     void tag();
     void textContent();
 

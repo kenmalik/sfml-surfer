@@ -2,7 +2,6 @@
 #include "css-scanner.h"
 #include "dom-tree.h"
 #include "scanner.h"
-#include "word.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/View.hpp>

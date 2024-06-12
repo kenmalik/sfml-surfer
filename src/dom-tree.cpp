@@ -94,8 +94,6 @@ void DOMTree::processToken() {
     case TEXT_CONTENT:
         addText(token.value);
         break;
-    case END:
-        return;
     default:
         std::cerr << "Unkown token" << std::endl;
         exit(1);

@@ -1,9 +1,7 @@
 set(TEST_SOURCES
     "../src/surfer.cpp"
     "../src/scanner.cpp"
-    "../src/token.cpp"
     "../src/dom-tree.cpp"
-    "../src/text-content.cpp"
     "../src/css-scanner.cpp"
     "../src/tag-scanner.cpp"
     "../src/styler.cpp")

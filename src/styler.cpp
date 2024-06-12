@@ -9,7 +9,6 @@
 #include "tag-type.h"
 #include "word.h"
 #include <algorithm>
-#include <iostream>
 
 Styler::Styler(TagType type) {
     switch (type) {

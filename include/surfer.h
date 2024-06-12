@@ -4,6 +4,7 @@
 #include "token.h"
 #include <string>
 #include <vector>
+
 class Surfer {
   public:
     static void runFile(std::string path);
