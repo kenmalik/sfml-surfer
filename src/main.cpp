@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <cxxopts.hpp>
 
 #include <iostream>
@@ -14,7 +15,16 @@ int main(int argc, char *argv[]) {
         ("f,file", "Input HTML file", cxxopts::value<std::string>())
         ("s,style", "Input stylesheet", cxxopts::value<std::string>());
 
-    auto result = options.parse(argc, argv);
+    cxxopts::ParseResult result;
+    try {
+        result = options.parse(argc, argv);
+    } catch (const cxxopts::exceptions::missing_argument &e) {
+        std::cout << options.help() << std::endl;
+        return EXIT_FAILURE;
+    } catch (const cxxopts::exceptions::no_such_option &e) {
+        std::cout << options.help() << std::endl;
+        return EXIT_FAILURE;
+    }
 
     if (result.count("help")) {
         std::cout << options.help() << std::endl;
