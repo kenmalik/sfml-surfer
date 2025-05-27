@@ -1,8 +1,9 @@
-#define VERSION "0.0.1" // TODO: make configured header
-
 #include <cxxopts.hpp>
-#include "surfer.h"
+
 #include <iostream>
+
+#include "surfer.h"
+#include "config.h"
 
 int main(int argc, char *argv[]) {
     cxxopts::Options options("SFML Surfer", "A CLI tool that renders HTML and CSS as SFML components");
@@ -19,7 +20,7 @@ int main(int argc, char *argv[]) {
         std::cout << options.help() << std::endl;
         return 0;
     } else if (result.count("version")) {
-        std::cout << "Version " << VERSION << std::endl;
+        std::cout << "Version " << SFML_SURFER_VERSION_MAJOR << "." << SFML_SURFER_VERSION_MINOR << std::endl;
         return 0;
     }
 

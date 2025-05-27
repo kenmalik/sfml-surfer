@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
-project(SFML_SURFER)
+project(SFML_SURFER VERSION 0.1)
+
+configure_file(config.h.in config.h)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -18,7 +20,7 @@ set(SOURCES
     "./src/styler.cpp")
 add_executable(sfml-surfer ${SOURCES})
 
-target_include_directories(sfml-surfer PRIVATE include)
+target_include_directories(sfml-surfer PRIVATE "include" "${PROJECT_BINARY_DIR}")
 
 include(FetchContent)
 
