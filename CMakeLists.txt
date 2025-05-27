@@ -29,7 +29,15 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(GUI_Library)
 
-target_include_directories(sfml-surfer PUBLIC ${GUI_Library_SOURCE_DIR}/include)
+FetchContent_Declare(
+  cxxopts
+  GIT_REPOSITORY git@github.com:jarro2783/cxxopts.git
+  GIT_TAG 44380e5a44706ab7347f400698c703eb2a196202
+)
+
+FetchContent_MakeAvailable(cxxopts)
+
+target_include_directories(sfml-surfer PUBLIC "${GUI_Library_SOURCE_DIR}/include" "${cxxopts_SOURCE_DIR}/include")
 target_link_libraries(sfml-surfer PUBLIC sfml-graphics sfml-window sfml-system
                                   sfml-audio gui-library)
 

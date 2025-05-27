@@ -1,14 +1,42 @@
+#define VERSION "0.0.1" // TODO: make configured header
+
+#include <cxxopts.hpp>
 #include "surfer.h"
 #include <iostream>
 
 int main(int argc, char *argv[]) {
-    if (argc > 3) {
-        std::cerr << "Usage: sfml-surfer [html file] [OPTIONAL: css file]"
-                  << std::endl;
-    } else if (argc == 3) {
-        Surfer::runFile(argv[1], argv[2]);
-    } else if (argc == 2) {
-        Surfer::runFile(argv[1]);
+    cxxopts::Options options("SFML Surfer", "A CLI tool that renders HTML and CSS as SFML components");
+
+    options.add_options()
+        ("h,help", "Show help")
+        ("v,version", "Show version")
+        ("f,file", "Input HTML file", cxxopts::value<std::string>())
+        ("s,style", "Input stylesheet", cxxopts::value<std::string>());
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")) {
+        std::cout << options.help() << std::endl;
+        return 0;
+    } else if (result.count("version")) {
+        std::cout << "Version " << VERSION << std::endl;
+        return 0;
+    }
+
+    std::string file;
+    if (result.count("file")) {
+        file = result["file"].as<std::string>();
+    }
+
+    std::string style;
+    if (result.count("style")) {
+        style = result["style"].as<std::string>();
+    }
+
+    if (!file.empty() && !style.empty()) {
+        Surfer::runFile(file, style);
+    } else if (!file.empty()) {
+        Surfer::runFile(file);
     } else {
         Surfer::runPrompt();
     }
