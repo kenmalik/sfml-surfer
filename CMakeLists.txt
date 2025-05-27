@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
-project(SFML_SURFER)
+project(SFML_SURFER VERSION 0.1)
+
+configure_file(config.h.in config.h)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -18,7 +20,7 @@ set(SOURCES
     "./src/styler.cpp")
 add_executable(sfml-surfer ${SOURCES})
 
-target_include_directories(sfml-surfer PRIVATE include)
+target_include_directories(sfml-surfer PRIVATE "include" "${PROJECT_BINARY_DIR}")
 
 include(FetchContent)
 
@@ -29,7 +31,15 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(GUI_Library)
 
-target_include_directories(sfml-surfer PUBLIC ${GUI_Library_SOURCE_DIR}/include)
+FetchContent_Declare(
+  cxxopts
+  GIT_REPOSITORY git@github.com:jarro2783/cxxopts.git
+  GIT_TAG 44380e5a44706ab7347f400698c703eb2a196202
+)
+
+FetchContent_MakeAvailable(cxxopts)
+
+target_include_directories(sfml-surfer PUBLIC "${GUI_Library_SOURCE_DIR}/include" "${cxxopts_SOURCE_DIR}/include")
 target_link_libraries(sfml-surfer PUBLIC sfml-graphics sfml-window sfml-system
                                   sfml-audio gui-library)
 
