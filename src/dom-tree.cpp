@@ -19,11 +19,9 @@ void DOMTree::render() {
     clear();
     root = new DomElement();
     openTags.push({root, "div"});
-    std::cout << "[LOG] Processing html..." << std::endl;
     while (!isAtEnd()) {
         processToken();
     }
-    std::cout << "[LOG] Applying css..." << std::endl;
     applyStyles();
 }
 
